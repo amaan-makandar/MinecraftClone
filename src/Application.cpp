@@ -33,7 +33,7 @@ int main() {
     //-------turns on wireframe mode
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    while (!glfwWindowShouldClose(window)) {
+    while (display.is_alive()) {
 
         camera.update();
 
@@ -46,8 +46,7 @@ int main() {
         chunkMgr.Render_Chunks();
 
         // swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        display.update();
     }
 
     glfwTerminate();

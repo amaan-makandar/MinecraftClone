@@ -40,6 +40,15 @@ GLFWwindow* Display::get_raw_ptr() {
 	return raw_window_ptr_;
 }
 
+void Display::update() {
+	glfwSwapBuffers(raw_window_ptr_);
+	glfwPollEvents();
+}
+
+bool Display::is_alive() {
+	return !glfwWindowShouldClose(raw_window_ptr_);
+}
+
 void glfw_init() {
 	if (GLFW_INIT)
 		cleanup_with_error("glfw already init");

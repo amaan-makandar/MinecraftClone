@@ -14,4 +14,6 @@ public:
 
 	static Display& get_instance();
 	GLFWwindow* get_raw_ptr();
+	void update();
+	bool is_alive();
 };
