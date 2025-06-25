@@ -1,82 +1,69 @@
 #include "ChunkManager.h"
 
-/*@TODO:
-	- fix chunk rendering around camera position
-*/
+int round_up(int num_to_round, int mult);
 
 ChunkManager::ChunkManager(Camera* camera, GLFWwindow* window)
 	: camera(camera), window(window)
 {
 }
 
-static long maxFloats = 0;
-static long maxRendered = 0;
-
 void ChunkManager::Render_Chunks()
 {
-	int tempRendered = 0;
-
-	
-
 	for (auto& iter: loadedChunks) {
 		iter.second->render();
-
-		//test code to find the max number of floats used in mesh generation
-		if (iter.second->numFloats() > maxFloats)
-			maxFloats = iter.second->numFloats();
-		tempRendered++;
-
-
 	}
-
-	if (tempRendered > maxRendered)
-		maxRendered = tempRendered;
 }
 
-void ChunkManager::printMaxFloats() {
-	printf("Max floats: %ld \n", maxFloats);
-	printf("Max chunks rendered: %d", maxRendered);
-}
-
-//clear
 void ChunkManager::Clear_Loaded_Chunks() {
 	loadedChunks.clear();
 }
 
-/*
-	- update load list
-	- update unload list
-	- add extra chunks if necessary?
-*/
+
 void ChunkManager::Update_Loaded_Chunks()
 {
-	//clear loaded chunks before computation
 	Clear_Loaded_Chunks();
 
-	//need to create new chunks around player and use ones already in chunkList
-	glm::vec3 camPos = camera->getPosition();
+	glm::vec3 cam_pos = camera->getPosition();
 
-	//loop through square centered at player position and only render chunks in circle around camera
-	//@TODO: 
-	//	- only update the loaded chunks list when a chunk border is crossed
-	//	- change rendering to center at cameraPos
-	for (int i = static_cast<int>(camPos.x) - radius; i < static_cast<int>(camPos.x) + radius; i++) {
-		for (int j = static_cast<int>(camPos.z) - radius; j < static_cast<int>(camPos.z) + radius; j++) {
-			//chunks only generate at integer multiples of the chunk size
-			if (i % CHUNK_SIZE == 0 && j % CHUNK_SIZE == 0) {
+	int iz = -radius;
 
-				if (chunkList.find({ i, j }) != chunkList.end()) {
-					loadedChunks.insert({ glm::ivec2(i, j) , chunkList.find({i, j})->second });
-				}
-				else 
-				{
-					//inserts new chunk into each chunk list and sets its data
-					chunkList.insert({ glm::ivec2{i , j}, new Chunk(camera, &chunkData, i, j)});
-					loadedChunks.insert({ {glm::ivec2{i, j}, chunkList.find(glm::ivec2{i, j})->second} });
-					loadedChunks.find(glm::ivec2{ i,j })->second->setData();
-				}
+	while (iz < radius) {
+		int dx = (int)sqrt(radius * radius - iz * iz);
+		int j = round_up(static_cast<int>(cam_pos.z) + iz, CHUNK_SIZE);
+		int ix = -dx;
+		
+		while (ix < dx) {
+			// chunk at cam_pos.x + ix, cam_pos.z + iz; round up to chunk size
+			int i = round_up(static_cast<int>(cam_pos.x) + ix, CHUNK_SIZE);
+			
+			auto possible_chunk = chunkList.find({i, j});
+			if (possible_chunk != chunkList.end()) {
+				loadedChunks.insert({{i, j}, possible_chunk->second});
 			}
+			else {
+				Chunk* new_chunk = new Chunk(camera, &chunkData, i, j);
+				chunkList.insert({ glm::ivec2{i , j}, new_chunk });
+				loadedChunks.insert({ {glm::ivec2{i, j}, new_chunk} });
+				new_chunk->setData();
+			}
+
+			ix += CHUNK_SIZE;
 		}
+
+		iz += CHUNK_SIZE;
 	}
 }
 
+int round_up(int num_to_round, int mult) {
+	if (mult == 0)
+		return num_to_round;
+
+	int rem = abs(num_to_round) % mult;
+	if (rem == 0)
+		return num_to_round;
+
+	if (num_to_round < 0)
+		return -(abs(num_to_round) - rem);
+	else
+		return num_to_round + mult - rem;
+}
