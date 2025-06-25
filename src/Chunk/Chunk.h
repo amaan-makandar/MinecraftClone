@@ -23,8 +23,8 @@ enum blockFace {
 };
 
 //chunk size data
-const static unsigned int CHUNK_SIZE = 32;
-const static unsigned int CHUNK_HEIGHT = 512;
+const static unsigned int CHUNK_SIZE = 16;
+const static unsigned int CHUNK_HEIGHT = 64;
 
 //visited bit positions
 const static unsigned int FIRST_VISITED = 1 << 6;

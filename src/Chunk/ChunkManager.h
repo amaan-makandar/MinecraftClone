@@ -20,14 +20,13 @@ private:
 	StaticChunkData chunkData;
 
 	Camera* camera;
-	MousePicker* picker;
 	GLFWwindow* window;
 
 	const static int radius = 16 * CHUNK_SIZE;
 
 public:
 
-	ChunkManager(Camera *camera, MousePicker* picker, GLFWwindow* window);
+	ChunkManager(Camera *camera, GLFWwindow* window);
 
 	//render all chunks in visibility list
 	void Render_Chunks();
@@ -38,14 +37,6 @@ public:
 	//of the camera position
 	void Update_Loaded_Chunks();
 
-	//----These methods will be used in the glfw mouse callback
-	//helper method to delete block at some chunk
-	void deleteBlockAtRay();
-	//helper method to add block at some chunk
-	void addBlockAtRay();
-
 	//test function to print the max number of floats used by a single chunk
 	void printMaxFloats();
-
-	void procBlockInput();
 };

@@ -1,5 +1,7 @@
 #include "Camera.h"
 
+static float camera_fov = 60.0f;
+
 float Camera::deltaTime = 0.0f;
 float Camera::lastFrame = 0.0f;
 
@@ -10,10 +12,9 @@ Camera::Camera()
 	firstMouse(true),
 	yaw(-90.0f),
 	pitch(0.0f),
-	//@TODO: change thing here
-	lastX((float)1920 / 2.0f),
-	lastY((float)1080 / 2.0f),
-    fov(0.0f)
+	lastX(0.0f),
+	lastY(0.0f),
+    fov(camera_fov)
 {
 }
 
@@ -34,11 +35,6 @@ void Camera::keyboard_input(GLFWwindow* window)
         cameraPos += cameraSpeed * glm::normalize(glm::cross(cameraFront, cameraUp));
 }
 
-void Camera::Set_Data(float fovIn)
-{
-    fov = fovIn;
-}
-
 void Camera::set_cursor_callback(GLFWwindow* window, Camera* camera)
 {
     glfwSetWindowUserPointer(window, camera);
@@ -50,10 +46,11 @@ void Camera::set_cursor_callback(GLFWwindow* window, Camera* camera)
     glfwSetCursorPosCallback(window, func);
 }
 
-void Camera::calc_time(float currentFrame)
+void Camera::update()
 {
-    deltaTime = currentFrame - lastFrame;
-    lastFrame = currentFrame;
+    float curr_time = static_cast<float>(glfwGetTime());
+    deltaTime = curr_time - lastFrame;
+    lastFrame = curr_time;
 }
 
 
@@ -94,8 +91,11 @@ void Camera::mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
 }
 
 glm::mat4 Camera::getPerspectiveMatrix() {
-    //change into SCR_WIDTH and SCR_HEIGHT
-    return glm::perspective(glm::radians(fov), (float)1920 / (float)1080, 0.1f, 10000.0f);
+    // viewport_data: [..., ..., scr_width, scr_height]
+    GLint viewport_data[4];
+    glGetIntegerv(GL_VIEWPORT, viewport_data);
+
+    return glm::perspective(glm::radians(fov), (float)viewport_data[2] / (float)viewport_data[3], 0.1f, 10000.0f);
 }
 
 glm::mat4 Camera::getViewMatrix() {

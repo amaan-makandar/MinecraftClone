@@ -1,5 +1,5 @@
 #pragma once
-
+#include <glad/glad.h>
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include <GLFW/glfw3.h>
@@ -24,23 +24,19 @@ private:
 	static float deltaTime;
 	static float lastFrame;
 
-	static const int SCR_HEIGHT = 1080;
-	static const int SCR_WIDTH = 1920;
-
 public:
 
 
 	Camera();
 
-	void Set_Data(float fovIn);
 	//mouse callback
 	void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 	//keyboard input
 	void keyboard_input(GLFWwindow* window);
 	//set cursor callback
 	void set_cursor_callback(GLFWwindow* window, Camera* camera);
-	//calculate time
-	void calc_time(float currentFrame);
+
+	void update();
 
 	inline float getFrameTime() { return deltaTime; }
 	inline glm::vec3 getPosition() { return cameraPos; };
