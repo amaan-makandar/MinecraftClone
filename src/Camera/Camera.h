@@ -11,6 +11,8 @@ private:
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;
 	glm::vec3 cameraUp;
+	float near_z;
+	float far_z;
 
 	//mouse controls
 	bool firstMouse;
@@ -39,10 +41,13 @@ public:
 	void update();
 
 	inline float getFrameTime() { return deltaTime; }
-	inline glm::vec3 getPosition() { return cameraPos; };
+	inline glm::vec3 getPosition() { return cameraPos; }
 
 	//MVP matrix getters
 	glm::mat4 getPerspectiveMatrix();
 	glm::mat4 getViewMatrix();
 	glm::vec3 getCameraFront();
+
+	float get_near_z();
+	float get_far_z();
 };

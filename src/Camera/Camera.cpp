@@ -14,7 +14,9 @@ Camera::Camera()
 	pitch(0.0f),
 	lastX(0.0f),
 	lastY(0.0f),
-    fov(camera_fov)
+    fov(camera_fov),
+    near_z(0.1f),
+    far_z(10000.0f)
 {
 }
 
@@ -95,7 +97,7 @@ glm::mat4 Camera::getPerspectiveMatrix() {
     GLint viewport_data[4];
     glGetIntegerv(GL_VIEWPORT, viewport_data);
 
-    return glm::perspective(glm::radians(fov), (float)viewport_data[2] / (float)viewport_data[3], 0.1f, 10000.0f);
+    return glm::perspective(glm::radians(fov), (float)viewport_data[2] / (float)viewport_data[3], near_z, far_z);
 }
 
 glm::mat4 Camera::getViewMatrix() {
@@ -104,4 +106,12 @@ glm::mat4 Camera::getViewMatrix() {
 
 glm::vec3 Camera::getCameraFront() {
     return cameraFront;
+}
+
+float Camera::get_near_z() {
+    return near_z;
+}
+
+float Camera::get_far_z() {
+    return far_z;
 }

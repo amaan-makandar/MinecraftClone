@@ -49,6 +49,14 @@ bool Display::is_alive() {
 	return !glfwWindowShouldClose(raw_window_ptr_);
 }
 
+int Display::get_height() {
+	return scr_height;
+}
+
+int Display::get_width() {
+	return scr_width;
+}
+
 void glfw_init() {
 	if (GLFW_INIT)
 		cleanup_with_error("glfw already init");

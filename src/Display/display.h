@@ -16,4 +16,7 @@ public:
 	GLFWwindow* get_raw_ptr();
 	void update();
 	bool is_alive();
+
+	int get_height();
+	int get_width();
 };

@@ -8,6 +8,7 @@
 #include "ChunkManager.h"
 #include "MousePicker.h"
 #include "Display/display.h"
+#include "Math/frustum.h"
 
 void processInput(GLFWwindow* window, Camera& camera);
 
@@ -47,6 +48,9 @@ int main() {
 
         // swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         display.update();
+
+        Frustum f = get_frustum_from_camera(camera);
+        f.print();
     }
 
     glfwTerminate();

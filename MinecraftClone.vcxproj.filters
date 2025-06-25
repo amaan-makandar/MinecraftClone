@@ -1412,6 +1412,9 @@
     <ClInclude Include="src\Display\display.h">
       <Filter>headers</Filter>
     </ClInclude>
+    <ClInclude Include="src\Math\frustum.h">
+      <Filter>headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\concreteTexture.png">
