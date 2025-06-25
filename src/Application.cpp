@@ -7,10 +7,6 @@
 #include "Camera.h"
 #include "ChunkManager.h"
 #include "MousePicker.h"
-#include "DataStructures/LRUCache.h"
-
-//ENTIRE CODE: MADE BY ZIPPY
-
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -22,36 +18,19 @@ unsigned int SCR_HEIGHT = 1080;
 float fov = 60.0f;
 Camera camera;
 
-/*TODO:
-    - render chunk in a single draw call (DONE)
-    - make it so covered faces are not rendered
-*/
-
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow* window)
-{
-   
-    //close window
+void processInput(GLFWwindow* window) {   
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    //camera controls (move into camera class and call here)
     camera.keyboard_input(window);
 }
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays.
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
     SCR_WIDTH = width;
     SCR_HEIGHT = height;
 }
 
-//zoom in controls with scroll
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     fov -= (float)yoffset;
     if (fov < 1.0f)
@@ -60,22 +39,12 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
         fov = 45.0f;
 }
 
-int main()
-{
-
-    // glfw: initialize and configure
-    // ------------------------------
+int main() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
-    // glfw window creation
-    // --------------------
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
     if (window == NULL)
     {
@@ -87,26 +56,17 @@ int main()
     glfwSetWindowPos(window, 0, 0);
     glfwSwapInterval(0);
 
-    //makes window context current
-    //----------------------------
     glfwMakeContextCurrent(window);
     
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 
-    //setting window size change function pointer
-    //-------------------------------------------
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    //sets cursor callback func
     camera.set_cursor_callback(window, &camera);
-    //sets scroll callback func
     glfwSetScrollCallback(window, scroll_callback);
 
-    //sets fov correctly
     camera.Set_Data(fov);
 
-    // glad: load all OpenGL function pointers
-    // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -116,13 +76,8 @@ int main()
     //tests whether fragments in front of other fragments
     glEnable(GL_DEPTH_TEST);
 
-    //MousePicker creation
     MousePicker picker(&camera, window);
 
-
-
-    //rendering done here
-    //-------------------
     //Chunk testChunk(&camera, 0, 0);
     ChunkManager chunkMgr(&camera, &picker, window);
 
@@ -131,75 +86,24 @@ int main()
 
     int numCount = 1;
     int total = 0;
-    
-    // render loop
-    // -----------
-    while (!glfwWindowShouldClose(window))
-    {
-        //calculating time logic each frame (move into camera class)
-        float currentFrame = static_cast<float>(glfwGetTime());
+
+    while (!glfwWindowShouldClose(window)) {
         
-        camera.calc_time(currentFrame);
-        float fps = 1 / (camera.getFrameTime());
-        std::cout << "FPS: " << fps << std::endl;
-
-        total += fps;
-        numCount++;
-
-        // input
-        // -----
         processInput(window);
 
-        // render
-        // ------
         glClearColor(0.455f, 0.702f, 0.820f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        /*testChunk.render();
-        testChunk.setData();*/
-        
-        //updates mouse picker data
         picker.update();
-
         chunkMgr.Update_Loaded_Chunks();
         chunkMgr.Render_Chunks();
         chunkMgr.procBlockInput();
 
 
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
+        // swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
-    // glfw: terminate, clearing all previously allocated GLFW resources.
-    // ------------------------------------------------------------------
-    
-    printf("Avg: %f\n", (float)total / numCount);
-
-    //test code to print max floats
-    chunkMgr.printMaxFloats();
-
-    //testing LRU cache
-    //LRUCache<int, int> cache(3);
-    //cache.put(123, 1);
-    //cache.put(1, 37);
-    //cache.put(4, 3);
-    //cache.get(4);
-    //std::vector<int> keys;
-    //auto iter = cache.iterator();
-    //printf("\n");
-    ////
-    //for (auto& ptr = iter.first; ptr != iter.second; ptr++) {
-    //    keys.push_back(ptr->first);
-    //}
-    ////values
-    //for (auto& iter : keys) {
-    //    printf("%d\n", *cache.get(iter));
-    //}
-
-
-
 
     glfwTerminate();
     return 0;
